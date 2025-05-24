@@ -1,0 +1,4 @@
+pandas
+numpy
+reflex
+reflex==0.7.12
