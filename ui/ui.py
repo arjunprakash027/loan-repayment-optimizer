@@ -1,37 +1,32 @@
 """Welcome to Reflex! This file outlines the steps to create a basic app."""
 
 import reflex as rx
-
 from rxconfig import config
-
-
+from ui.components.render_payment_plan import input_details
 class State(rx.State):
     """The app state."""
-
     ...
 
 
 def index() -> rx.Component:
     # Welcome Page (Index)
-    return rx.container(
-        rx.color_mode.button(position="top-right"),
-        rx.vstack(
-            rx.heading("Welcome to Reflex!", size="9"),
-            rx.text(
-                "Get started by editing ",
-                rx.code(f"{config.app_name}/{config.app_name}.py"),
-                size="5",
+    return rx.center(
+        rx.box(
+            rx.color_mode.button(position="fixed", right="4", top="4"),
+            rx.vstack(
+                rx.heading("Welcome to Loan Repayment Planner", size="9"),
+                input_details(),
+                spacing="8",
+                justify="center",
+                align_items="center",
+                min_height="100vh",
+                width="100%",
+                padding_y="8",
             ),
-            rx.link(
-                rx.button("Check out our docs!"),
-                href="https://reflex.dev/docs/getting-started/introduction/",
-                is_external=True,
-            ),
-            spacing="5",
-            justify="center",
-            min_height="85vh",
+            rx.logo(),
+            width="100%",
         ),
-        rx.logo(),
+        width="100%",
     )
 
 

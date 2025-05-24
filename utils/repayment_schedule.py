@@ -36,13 +36,13 @@ def repayment_calender(
     
     repayment_schedule_df = pd.DataFrame(
         columns=[
-            "Instal.No.",
-            "Due Date",
-            "Opening Principal(INR)",
-            "Installment Amount (INR)",
-            "Principal (INR)",
-            "Interest (INR)",
-            "Closing Principal(INR)"
+            "instal_no",
+            "due_date",
+            "opening_principal",
+            "emi",
+            "principal_comp",
+            "interest_comp",
+            "closing_principal"
         ]
     )
 
@@ -56,13 +56,13 @@ def repayment_calender(
 
     while True:
         current_installment = {
-            "Instal.No.": installment_no,
-            "Due Date": current_date,
-            "Opening Principal(INR)": opening_pa,
-            "Installment Amount (INR)": 0,
-            "Principal (INR)": 0,
-            "Interest (INR)": 0,
-            "Closing Principal(INR)": 0
+            "instal_no": installment_no,
+            "due_date": current_date,
+            "opening_principal": opening_pa,
+            "emi": 0,
+            "principal_comp": 0,
+            "interest_comp": 0,
+            "closing_principal": 0
         }
 
 
@@ -83,7 +83,7 @@ def repayment_calender(
                     interest_per_annum=annual_interest
                 )
             )
-        current_installment['Interest (INR)'] = interest
+        current_installment['interest_comp'] = interest
 
         # Update the EMI based on before/after moratorium
         if current_date <= end_of_morotorium_date:
@@ -92,20 +92,20 @@ def repayment_calender(
             emi = smart_round(after_morotorium_emi)
 
         if emi <= opening_pa:
-            current_installment['Installment Amount (INR)'] = emi
+            current_installment['emi'] = emi
         else:
             emi = smart_round(opening_pa + interest)
-            current_installment['Installment Amount (INR)'] = emi
+            current_installment['emi'] = emi
 
         # Current principal that will be added to opening principal to create next principal
         current_principal = smart_round(emi - interest)
 
-        current_installment['Principal (INR)'] = current_principal
+        current_installment['principal_comp'] = current_principal
 
         # Closing principal
         closing_pa = smart_round(opening_pa - current_principal)
 
-        current_installment['Closing Principal(INR)'] = closing_pa
+        current_installment['closing_principal'] = closing_pa
 
         # Append the current installment to the DataFrame
         repayment_schedule_df = pd.concat(
@@ -146,7 +146,7 @@ if __name__ == "__main__":
 
     print(schedule)
     schedule.to_csv("Schedule.csv")
-    print(schedule['Installment Amount (INR)'].sum())
+    print(schedule['emi'].sum())
 
 
 
