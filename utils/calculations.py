@@ -25,7 +25,4 @@ def calculate_pre_emi_interest(
     per_day_interest_rough = round((interest_per_annum / 365), 5)
     days_difference = (emi_start_date - loan_disbursal_date).days
 
-    print(days_difference)
-    print(per_day_interest_rough)
-
     return pa * per_day_interest_rough * (days_difference - 1)

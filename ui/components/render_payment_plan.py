@@ -5,57 +5,103 @@ import pandas as pd
 from typing import List, Dict
 
 class LoanState(rx.State):
-    loan_disbursal_date: str = "2025-05-22"
-    start_date: str = "2025-07-01"
-    principal_amount: int = 100_000
-    end_of_morotorium_date: str = "2027-06-01"
-    morotorium_emi: int = 5_000
-    after_morotorium_emi: int = 10_000
-    annual_interest_rate: float = 0.1100
+    loan_disbursal_date: str | None = "2025-05-22"
+    start_date: str | None = "2025-07-01"
+    principal_amount: int | None = 100_000
+    end_of_morotorium_date: str | None = "2027-06-01"
+    morotorium_emi: int | None = 5_000
+    after_morotorium_emi: int | None = 10_000
+    annual_interest_rate: float | None = 0.1100
 
     loan_repayment_df: pd.DataFrame = pd.DataFrame({})
 
 
-    def compute_schedule(self):
+    def handle_submit(self, form_data: dict):
+        """
+        form_data is a dict of {input_name: value} where every value
+        arrives **as a string**.  Convert here, then run the calculator.
+        """
         df = repayment_calender(
-            loan_disbursal_date=self.loan_disbursal_date,
-            start_date=self.start_date,
-            pa=self.principal_amount,
-            end_of_morotorium_date=self.end_of_morotorium_date,
-            morotorium_emi=self.morotorium_emi,
-            after_morotorium_emi=self.after_morotorium_emi,
-            annual_interest=self.annual_interest_rate,
+            loan_disbursal_date = form_data["loan_disbursal_date"],
+            start_date          = form_data["start_date"],
+            pa                  = int(form_data["principal_amount"]),
+            end_of_morotorium_date = form_data["end_of_morotorium_date"],
+            morotorium_emi      = int(form_data["morotorium_emi"]),
+            after_morotorium_emi= int(form_data["after_morotorium_emi"]),
+            annual_interest     = float(form_data["annual_interest_rate"]),
         )
         self.loan_repayment_df = df
 
-#  Helper for a labelled input bound to LoanState.<field>
-def bound_input(label: str, field: str, **kwargs):
+def form_input(component_name: str, **props):
+
     return rx.vstack(
-        rx.text(label, size="2", weight="bold"),
-        rx.input(
-            value=getattr(LoanState, field),
-            on_change=lambda v: getattr(LoanState, f"set_{field}")(v),
-            **kwargs,
-        ),
-        align_items="start",
+        rx.text(component_name,size='2',weight="bold"),
+        rx.input(**props),
+        align='start',
     )
 
 #  Public component imported in index()
 def input_details() -> rx.Component:
     return rx.vstack(
-        bound_input("Loan disbursal date", "loan_disbursal_date", type="date"),
-        bound_input("EMI start date", "start_date", type="date"),
-        bound_input("Principal amount (₹)", "principal_amount", type="number"),
-        bound_input("End of moratorium date", "end_of_morotorium_date", type="date"),
-        bound_input("Moratorium EMI (₹)", "morotorium_emi", type="number"),
-        bound_input("EMI after moratorium (₹)", "after_morotorium_emi", type="number"),
-        bound_input(
-            "Annual interest rate (decimal, e.g. 0.11)",
-            "annual_interest_rate",
-            type="number",
-            step="0.0001",
+        rx.form(
+            # ── dates ─────────────────────────────────────────────
+            form_input(
+                "Loan disbursal date",
+                name="loan_disbursal_date",
+                type="date",
+                default_value="2025-05-22",
+            ),
+            form_input(
+                "EMI start date",
+                name="start_date",
+                type="date",
+                default_value="2025-07-01",
+            ),
+            form_input(
+                "End of moratorium",
+                name="end_of_morotorium_date",
+                type="date",
+                default_value="2027-06-01",
+            ),
+
+            # ── numbers ───────────────────────────────────────────
+            form_input(
+                "Principal amount (₹)",
+                name="principal_amount",
+                type="number",
+                default_value="100000",
+                min_="0",
+            ),
+            form_input(
+                "Moratorium EMI (₹)",
+                name="morotorium_emi",
+                type="number",
+                default_value="5000",
+            ),
+            form_input(
+                "EMI after moratorium (₹)",
+                name="after_morotorium_emi",
+                type="number",
+                default_value="10000",
+                min_="0",
+            ),
+            form_input(
+                "Annual interest rate (e.g. 0.11)",
+                name="annual_interest_rate",
+                type="number",
+                default_value="0.1100",
+                min_="0",
+                max_="1",
+                step="0.0001",
+                #pattern="[0-9]*.?[0-9]*"
+            ),
+
+            # ── action ────────────────────────────────────────────
+            rx.button("Generate Schedule", type_="submit"),
+
+            on_submit=LoanState.handle_submit,   # single state update
+            spacing="4",
         ),
-        rx.button("Generate Schedule", on_click=LoanState.compute_schedule),
         rx.divider(),
         rx.box(
             rx.data_table(
