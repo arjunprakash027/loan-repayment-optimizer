@@ -14,7 +14,6 @@ def index() -> rx.Component:
         rx.box(
             rx.color_mode.button(position="fixed", right="4", top="4"),
             rx.vstack(
-                rx.heading("Welcome to Loan Repayment Planner", size="9"),
                 input_details(),
                 spacing="8",
                 justify="center",
