@@ -1,6 +1,6 @@
 # Loan Repayment Optimizer
 
-A web-based application to help users optimize their loan repayment strategies. This tool calculates and visualizes loan repayment schedules based on various parameters including moratorium periods, varying EMI structures, and interest rates.
+A web-based application to help users optimize their loan repayment strategies. This tool calculates and visualizes loan repayment schedules based on various parameters including moratorium periods, varying EMI structures, and interest rates. The application is structured as a multi-page Streamlit app with navigation available in the sidebar.
 
 ## Current Features
 
@@ -42,9 +42,19 @@ This application is currently in the build stage with several features planned f
 ## Tech Stack
 
 - Python
-- Reflex Framework
+- Streamlit
 - Pandas for calculations
 - Interactive data tables for visualization
+
+## Running the Application
+
+To run the application locally, ensure you have Python and pip installed. Then, navigate to the project directory and run:
+
+```bash
+pip install -r requirements.txt
+streamlit run main.py
+```
+The application will launch with a sidebar for navigating between different tools/pages.
 
 ## Note
 
