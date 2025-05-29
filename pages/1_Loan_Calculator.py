@@ -9,8 +9,6 @@ st.set_page_config(page_title="Loan Repayment Calculator", layout="wide")
 # Initialize session state variables
 if 'loan_repayment_df' not in st.session_state:
     st.session_state.loan_repayment_df = pd.DataFrame({})
-if 'is_loading' not in st.session_state:
-    st.session_state.is_loading = False
 if 'has_data' not in st.session_state:
     st.session_state.has_data = False
 
@@ -25,25 +23,24 @@ def display_loan_calculator():
         st.header("Loan Timeline")
         col1, col2, col3 = st.columns(3)
         with col1:
-            loan_disbursal_date_val = st.date_input("Loan Disbursal Date", value=date(2025, 5, 22), name="loan_disbursal_date")
+            loan_disbursal_date_val = st.date_input("Loan Disbursal Date", value=date(2025, 5, 22))
         with col2:
-            start_date_val = st.date_input("EMI Start Date", value=date(2025, 7, 1), name="start_date")
+            start_date_val = st.date_input("EMI Start Date", value=date(2025, 7, 1))
         with col3:
-            end_of_morotorium_date_val = st.date_input("End of Moratorium", value=date(2027, 6, 1), name="end_of_morotorium_date")
+            end_of_morotorium_date_val = st.date_input("End of Moratorium", value=date(2027, 6, 1))
 
         st.header("Financial Details")
         col_fin1, col_fin2 = st.columns(2)
         with col_fin1:
-            principal_amount_val = st.number_input("Principal Amount (₹)", min_value=0, value=100000, name="principal_amount", type="int")
-            morotorium_emi_val = st.number_input("Moratorium EMI (₹)", min_value=0, value=5000, name="morotorium_emi", type="int")
+            principal_amount_val = st.number_input("Principal Amount (₹)", min_value=0, value=100000)
+            morotorium_emi_val = st.number_input("Moratorium EMI (₹)", min_value=0, value=5000)
         with col_fin2:
-            annual_interest_rate_val = st.number_input("Annual Interest Rate", min_value=0.0, max_value=1.0, value=0.1100, step=0.0001, format="%.4f", name="annual_interest_rate", type="float")
-            after_morotorium_emi_val = st.number_input("Post-Moratorium EMI (₹)", min_value=0, value=10000, name="after_morotorium_emi", type="int")
+            annual_interest_rate_val = st.number_input("Annual Interest Rate", min_value=0.0, max_value=1.0, value=0.1100, step=0.0001, format="%.4f")
+            after_morotorium_emi_val = st.number_input("Post-Moratorium EMI (₹)", min_value=0, value=10000)
         
         submit_button = st.form_submit_button(label="Generate Schedule")
 
         if submit_button:
-            st.session_state.is_loading = True
             st.session_state.has_data = False # Reset data state on new submission
 
             try:
@@ -61,13 +58,8 @@ def display_loan_calculator():
             except Exception as e:
                 st.error(f"Error calculating repayment: {e}")
                 st.session_state.has_data = False
-            finally:
-                st.session_state.is_loading = False
-
-    if st.session_state.get('is_loading', False):
-        with st.spinner("Calculating... Please wait..."):
-            pass 
-    elif st.session_state.get('has_data', False) and not st.session_state.loan_repayment_df.empty:
+                
+    if st.session_state.get('has_data', False) and not st.session_state.loan_repayment_df.empty:
         # Calculate summary values
         total_emi = st.session_state.loan_repayment_df['emi'].sum()
         total_interest = st.session_state.loan_repayment_df['interest_comp'].sum()
@@ -96,5 +88,4 @@ def display_loan_calculator():
     elif st.session_state.get('has_data', False) and st.session_state.loan_repayment_df.empty:
         st.warning("Calculation resulted in an empty schedule. Please check your inputs.")
 
-# Call the function to display the calculator
 display_loan_calculator()
